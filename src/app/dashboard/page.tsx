@@ -1,23 +1,39 @@
 "use client";
 
 import { useAuthStore } from "@/store/useAuthStore";
-import { useDocuments } from "@/hooks/useDocuments"; // Our new hook
+import { useDocuments } from "@/hooks/useDocuments";
+import { Button } from "@/components/ui/button";
+
 
 export default function DashboardPage() {
     const user = useAuthStore((state) => state.user);
+
+    const logout = useAuthStore((state) => state.logout);
 
     // TanStack Query gives us these status variables for free!
     const { data: documents, isLoading, isError } = useDocuments();
 
     return (
-        <div className="p-8">
-            <h1 className="text-3xl font-bold tracking-tight">
-                Welcome, {user?.name || "Guest"}
-            </h1>
 
+        <div className="p-8">
+            <div className="flex justify-between items-center mb-8">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">
+                        Welcome, {user?.name || "Guest"}
+                    </h1>
+                    <p className="text-slate-500">Your secure vault</p>
+                </div>
+
+                <Button
+                    variant="outline"
+                    onClick={() => logout()}
+                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                >
+                    Logout
+                </Button>
+            </div>
             <div className="mt-8">
                 <h2 className="text-xl font-semibold mb-4">Your Documents</h2>
-
                 {/* 1. Handling the Loading State */}
                 {isLoading && <p className="text-slate-500 animate-pulse">Fetching your vault...</p>}
 

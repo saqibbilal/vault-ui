@@ -27,9 +27,18 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     // Wipe user data on logout
     logout: async () => {
-        await api.post('/api/v1/logout');
-        set({ user: null, isAuthenticated: false });
-        window.location.href = '/login';
+        try {
+            // Try to tell the server to logout
+            await api.post('/api/v1/logout');
+        } catch (error) {
+            // We catch the 401 here but DON'T stop the code.
+            // If the server says 401, it means you're already logged out there.
+            console.warn("Server-side logout failed or session already expired.");
+        } finally {
+            // ALWAYS clear the frontend and redirect, regardless of API success
+            set({ user: null, isAuthenticated: false });
+            window.location.href = '/login';
+        }
     },
 
     // Ask Laravel "Who am I?" (to see if the cookie is still valid)
