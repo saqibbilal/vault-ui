@@ -1,53 +1,55 @@
 import { create } from 'zustand';
 import api from '@/lib/axios';
-
-
-interface User {
-    id: number;
-    name: string;
-    email: string;
-    roles: string[];        // Array of role names (e.g., ['admin'])
-    permissions: string[];  // Array of permission names (e.g., ['edit-docs'])
-}
+import { persist, createJSONStorage } from "zustand/middleware";
+import { User } from '@/types';
 
 interface AuthState {
     user: User | null;
+    token: string | null; // The Bearer Token
     isAuthenticated: boolean;
-    login: (userData: User) => void;
+    setAuth: (userData: User, token: string) => void; // We'll call it setAuth to clearly distinguish it from the API call
     logout: () => Promise<void>;
-    checkAuth: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-    user: null,
-    isAuthenticated: false,
+export const useAuthStore = create<AuthState>()(
+    persist(
+        (set, get) => ({
+            user: null,
+            token: null,
+            isAuthenticated: false,
 
-    // Set user data after successful login
-    login: (userData) => set({ user: userData, isAuthenticated: true }),
+            // 1. Updated to catch the token from the backend
+            setAuth: (userData, token) => set({
+                user: userData,
+                token: token,
+                isAuthenticated: true
+            }),
 
-    // Wipe user data on logout
-    logout: async () => {
-        try {
-            // Try to tell the server to logout
-            await api.post('/api/v1/logout');
-        } catch (error) {
-            // We catch the 401 here but DON'T stop the code.
-            // If the server says 401, it means you're already logged out there.
-            console.warn("Server-side logout failed or session already expired.");
-        } finally {
-            // ALWAYS clear the frontend and redirect, regardless of API success
-            set({ user: null, isAuthenticated: false });
-            window.location.href = '/login';
+            // 2. Updated logout for Token usage
+            logout: async () => {
+                try {
+                    // Axios Interceptor will automatically attach the token here
+                    await api.post('/api/v1/logout');
+                } catch (error) {
+                    console.warn("Server-side logout failed.");
+                } finally {
+                    // Clear EVERYTHING
+                    set({ user: null, token: null, isAuthenticated: false });
+
+                    // Use window.location for a "hard reset" of the app state
+                    window.location.href = '/login';
+                }
+            },
+        }),
+        {
+            name: 'vault-auth-storage', // Key in LocalStorage
+            storage: createJSONStorage(() => localStorage),
+            // Optional: Only persist the user and token
+            partialize: (state) => ({
+                user: state.user,
+                token: state.token,
+                isAuthenticated: state.isAuthenticated
+            }),
         }
-    },
-
-    // Ask Laravel "Who am I?" (to see if the cookie is still valid)
-    checkAuth: async () => {
-        try {
-            const response = await api.get('/api/user');
-            set({ user: response.data, isAuthenticated: true });
-        } catch (error) {
-            set({ user: null, isAuthenticated: false });
-        }
-    }
-}));
+    )
+);
