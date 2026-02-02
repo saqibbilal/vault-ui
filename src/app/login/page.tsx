@@ -15,26 +15,30 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
-    const login = useAuthStore((state) => state.login);
+    const { setAuth } = useAuthStore();
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
         try {
-            // 1. Get CSRF Cookie (Required for Sanctum)
-            await api.get("/sanctum/csrf-cookie");
-
-            // 2. Perform Login
+            // 1. Perform Login (CSRF handshake is NO LONGER REQUIRED for tokens)
             const response = await api.post("/api/v1/login", { email, password });
 
-            // 3. Handle Success (Store token if not using cookies, or redirect)
-            if (response.status === 200) {
-                login(response.data.user);
-                router.push("/dashboard");
-            }
-        } catch (error) {
+            // 2. Extract user and token from the response
+            // Laravel returns: { user: {...}, token: "..." }
+            const { user, token } = response.data;
+
+            // 3. Store in Zustand (this also triggers the 'persist' to LocalStorage)
+            setAuth(user, token);
+
+            // 4. Redirect
+            router.push("/dashboard");
+
+        } catch (error: any) {
+            // Professional tip: Check if Laravel sent a specific validation message
+            const message = error.response?.data?.message || "Invalid credentials. Please try again.";
             console.error("Login failed", error);
-            alert("Invalid credentials. Please try again.");
+            alert(message);
         } finally {
             setLoading(false);
         }
