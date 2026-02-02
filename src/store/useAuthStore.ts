@@ -13,7 +13,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
     persist(
-        (set, get) => ({
+        (set) => ({
             user: null,
             token: null,
             isAuthenticated: false,
@@ -30,7 +30,7 @@ export const useAuthStore = create<AuthState>()(
                 try {
                     // Axios Interceptor will automatically attach the token here
                     await api.post('/api/v1/logout');
-                } catch (error) {
+                } catch {
                     console.warn("Server-side logout failed.");
                 } finally {
                     // Clear EVERYTHING

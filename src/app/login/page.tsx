@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuthStore } from "@/store/useAuthStore";
+import axios from "axios";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -34,10 +35,23 @@ export default function LoginPage() {
             // 4. Redirect
             router.push("/dashboard");
 
-        } catch (error: any) {
-            // Professional tip: Check if Laravel sent a specific validation message
-            const message = error.response?.data?.message || "Invalid credentials. Please try again.";
-            console.error("Login failed", error);
+        } catch (error: unknown) {
+            let message = "An unexpected error occurred. Please try again.";
+
+            // 1. Check if the error is an Axios error
+            if (axios.isAxiosError(error)) {
+                // 2. Extract the message from Laravel's standard response format
+                message = error.response?.data?.message || error.message;
+
+                // 3. Optional: Log specific validation errors for debugging
+                if (error.response?.status === 422) {
+                    console.error("Validation Errors:", error.response.data.errors);
+                }
+            } else {
+                // 4. Handle non-Axios errors (like code crashes)
+                console.error("Non-Axios Error:", error);
+            }
+
             alert(message);
         } finally {
             setLoading(false);
