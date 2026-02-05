@@ -15,6 +15,7 @@ export default function DashboardHeader() {
                     Welcome, {user?.name || "Guest"}
                 </h1>
                 <p className="text-slate-500">Your secure personal vault</p>
+                <p className="text-slate-500">Search through notes and documents semantically</p>
             </div>
 
             <Button
