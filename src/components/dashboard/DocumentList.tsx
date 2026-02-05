@@ -14,25 +14,42 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-export default function DocumentList() {
-    const { data: documents, isLoading, isError } = useDocuments();
+// 1. Define the props interface
+interface DocumentListProps {
+    documents?: Document[]; // Optional prop for search results
+}
+
+// 2. Accept the prop in the function signature
+export default function DocumentList({ documents: searchResults }: DocumentListProps) {
+    const { data: fetchedDocs, isLoading, isError } = useDocuments();
     const deleteMutation = useDeleteDocument();
+
+    // 3. Logic to decide which data to show
+    // Use searchResults if they exist, otherwise fallback to TanStack Query data
+    const displayDocs = (searchResults && Array.isArray(searchResults))
+        ? searchResults
+        : fetchedDocs;
 
     const storageBaseUrl = `${process.env.NEXT_PUBLIC_API_URL}/storage`;
 
     return (
         <div className="mt-8">
-            <h2 className="text-xl font-semibold mb-4 border-b pb-2">Your Documents</h2>
+            {/* 4. Dynamic title based on context */}
+            <h2 className="text-xl font-semibold mb-4 border-b pb-2">
+                {searchResults ? "Search Results" : "Your Documents"}
+            </h2>
 
-            {isLoading && <p className="text-slate-500 animate-pulse">Fetching your vault...</p>}
+            {/* Only show loading for the initial vault fetch, not when search results are present */}
+            {isLoading && !searchResults && <p className="text-slate-500 animate-pulse">Fetching your vault...</p>}
             {isError && <p className="text-red-500">Could not connect to the API.</p>}
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {documents?.map((doc: Document) => (
+                {displayDocs?.map((doc: Document) => (
                     <div
                         key={doc.id}
                         className="p-4 bg-white border rounded-lg shadow-sm hover:shadow-md transition-all flex flex-col justify-between relative group"
                     >
+                        {/* ... (rest of your existing card JSX stays exactly the same) ... */}
                         <div>
                             <div className="flex justify-between items-start mb-2">
                                 <h3 className="font-bold text-slate-800 truncate pr-2" title={doc.title}>
@@ -53,7 +70,6 @@ export default function DocumentList() {
                                 <div className="mt-2">
                                     {doc.file_path?.match(/\.(jpeg|jpg|gif|png)$/i) ? (
                                         <div className="relative aspect-video w-full overflow-hidden rounded-md border bg-slate-100 mb-3">
-                                            {/* eslint-disable-next-line @next/next/no-img-element */}
                                             <img
                                                 src={`${storageBaseUrl}/${doc.file_path}`}
                                                 alt={doc.title}
@@ -77,11 +93,8 @@ export default function DocumentList() {
                             )}
                         </div>
 
-                        {/* BOTTOM BAR */}
                         <div className="mt-3 pt-2 border-t text-[10px] text-slate-400 flex justify-between items-center">
                             <span>ID: #{doc.id}</span>
-
-                            {/* SHADCN ALERT DIALOG FOR DELETE */}
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
                                     <button
@@ -110,16 +123,18 @@ export default function DocumentList() {
                                     </AlertDialogFooter>
                                 </AlertDialogContent>
                             </AlertDialog>
-
                             <span>{doc.created_at ? new Date(doc.created_at).toLocaleDateString() : ''}</span>
                         </div>
                     </div>
                 ))}
             </div>
 
-            {!isLoading && documents?.length === 0 && (
+            {/* 5. Handle empty states for both search and regular list */}
+            {!isLoading && displayDocs?.length === 0 && (
                 <div className="text-center py-12 border-2 border-dashed rounded-xl">
-                    <p className="text-slate-400">Your vault is empty.</p>
+                    <p className="text-slate-400">
+                        {searchResults ? "No results found for your query." : "Your vault is empty."}
+                    </p>
                 </div>
             )}
         </div>
