@@ -2,46 +2,43 @@
 
 import { useState } from "react";
 import api from "@/lib/axios";
+import { useSearchStore } from "@/store/useSearchStore"; // Import
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Loader2, Sparkles } from "lucide-react";
 
-interface SemanticSearchProps {
-    onResults: (results: any[]) => void;
-    onClear: () => void;
-}
-
-export default function SemanticSearch({ onResults, onClear }: SemanticSearchProps) {
+export default function SemanticSearch() {
     const [query, setQuery] = useState("");
-    const [isSearching, setIsSearching] = useState(false);
+
+    // Get actions from store
+    const setSearchResults = useSearchStore((state) => state.setSearchResults);
+    const setLoading = useSearchStore((state) => state.setLoading);
+    const isSearching = useSearchStore((state) => state.isSearching);
+    const clearSearch = useSearchStore((state) => state.clearSearch);
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!query.trim()) return;
 
-        setIsSearching(true);
+        setLoading(true);
         try {
-            const response = await api.get("/api/v1/search/semantic", {
+            const { data } = await api.get("/api/v1/search/semantic", {
                 params: { query },
             });
 
-            // 1. response.data is the JSON from Laravel: { data: [...] }
-            // 2. response.data.data is the ACTUAL ARRAY of documents
-            const resultsArray = response.data.data;
-
-            // Pass ONLY the array to the parent
-            onResults(resultsArray);
-
+            // Drill into Laravel Resource and Axios wrappers
+            setSearchResults(data.data);
         } catch (error) {
             console.error("Semantic search failed:", error);
+            setSearchResults([]); // Set to empty array to show "No results" UI
         } finally {
-            setIsSearching(false);
+            setLoading(false);
         }
     };
 
     const handleClear = () => {
         setQuery("");
-        onClear();
+        clearSearch();
     };
 
     return (
@@ -52,8 +49,8 @@ export default function SemanticSearch({ onResults, onClear }: SemanticSearchPro
                 </div>
                 <Input
                     type="text"
-                    placeholder="Ask your vault anything... (e.g. 'notes about my tax returns')"
-                    className="pl-10 pr-24 h-12 shadow-sm border-slate-200 focus-visible:ring-slate-400"
+                    placeholder="Search your vault's meaning..."
+                    className="pl-10 pr-24 h-12 shadow-sm border-slate-200 focus-visible:ring-indigo-400 transition-all"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                 />
@@ -64,7 +61,7 @@ export default function SemanticSearch({ onResults, onClear }: SemanticSearchPro
                             variant="ghost"
                             size="sm"
                             onClick={handleClear}
-                            className="h-9 text-slate-500"
+                            className="h-9 text-slate-400 hover:text-slate-600"
                         >
                             Clear
                         </Button>
@@ -73,15 +70,12 @@ export default function SemanticSearch({ onResults, onClear }: SemanticSearchPro
                         type="submit"
                         size="sm"
                         disabled={isSearching}
-                        className="h-9 bg-slate-900 hover:bg-slate-800 text-white"
+                        className="h-9 bg-slate-900 hover:bg-indigo-600 text-white transition-colors"
                     >
                         {isSearching ? <Loader2 className="animate-spin h-4 w-4" /> : <Search className="h-4 w-4" />}
                     </Button>
                 </div>
             </form>
-            <p className="text-xs text-center mt-2 text-slate-400 italic">
-                Powered by Google Gemini & pgvector
-            </p>
         </div>
     );
 }
