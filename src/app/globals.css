@@ -123,3 +123,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+@theme {
+  /* ... existing theme variables ... */
+  --color-grid-pattern: rgba(99, 102, 241, 0.1);
+  --color-hero-glow: rgba(139, 92, 246, 0.15);
+  /* Fix for Animations */
+  --animate-bounce-slow: bounce-slow 4s infinite ease-in-out;
+
+  @keyframes bounce-slow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-26px); }
+  }
+}

@@ -1,78 +1,329 @@
+"use client";
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Sparkles, Shield, Zap, ArrowRight } from "lucide-react";
+import { motion } from 'framer-motion'; // Added motion import
+import {
+    FileText, Shield, Search, Cpu, Check, ArrowRight,
+    FileCode, FileImage, MousePointerClick, Star, Quote,
+    Github, Twitter, Linkedin, Zap, Fingerprint, Layers
+} from "lucide-react";
 
 export default function LandingPage() {
-  return (
-      <div className="bg-[#0f172a] min-h-screen text-[#f8fafc] selection:bg-[#22d3ee]/30">
-        {/* NAVBAR */}
-        <nav className="flex justify-between items-center px-8 py-6 max-w-7xl mx-auto">
-          <div className="flex items-center gap-2">
-            <div className="bg-gradient-to-br from-[#6366f1] to-[#22d3ee] p-2 rounded-lg">
-              <Zap className="h-6 w-6 text-white fill-current" />
-            </div>
-            <span className="text-2xl font-black tracking-tighter italic">LEXIS</span>
-          </div>
-          <div className="flex gap-6 items-center">
-            <Link href="/login" className="text-sm font-medium hover:text-[#22d3ee] transition-colors">Sign In</Link>
-            <Link href="/register" className="bg-[#6366f1] hover:bg-[#4f46e5] px-5 py-2 rounded-full text-sm font-bold transition-all shadow-lg shadow-indigo-500/20">
-              Get Started
-            </Link>
-          </div>
-        </nav>
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
 
-        {/* HERO SECTION */}
-        <section className="px-8 pt-20 pb-32 max-w-5xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 px-4 py-1.5 rounded-full mb-8">
-            <Sparkles className="h-4 w-4 text-[#22d3ee]" />
-            <span className="text-xs font-bold text-indigo-300 uppercase tracking-widest">Next-Gen Semantic Storage</span>
-          </div>
+    return (
+        <div className="bg-white text-slate-900 font-sans selection:bg-violet-100 overflow-x-hidden relative">
 
-          <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-8 leading-[0.9]">
-            Stop Searching. <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6366f1] via-[#22d3ee] to-[#6366f1]">Start Finding.</span>
-          </h1>
-
-          <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed">
-            Lexis understands the <span className="text-white italic">intent</span> behind your documents.
-            Upload PDFs, Word docs, and notes to a vault that thinks like you do.
-          </p>
-
-          <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
-            <Link href="/register" className="group bg-[#f8fafc] text-[#0f172a] px-8 py-4 rounded-2xl font-bold text-lg flex items-center gap-2 hover:scale-105 transition-all">
-              Create Your Private Vault
-              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
-        </section>
-
-        {/* FEATURE GRID */}
-        <section className="px-8 py-24 bg-black/20 border-y border-white/5">
-          <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
-            <div className="p-8 rounded-3xl bg-white/5 border border-white/10 hover:border-indigo-500/50 transition-colors">
-              <div className="bg-indigo-500/20 p-3 rounded-2xl w-fit mb-6">
-                <Sparkles className="h-6 w-6 text-indigo-400" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Semantic Intelligence</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">Our AI indexes the context of your files, allowing you to search by concepts, not just keywords.</p>
+            {/* --- 1. THE "FORCED" HERO BACKGROUND --- */}
+            <div className="absolute top-0 left-0 w-full h-[1000px] z-0 overflow-hidden pointer-events-none">
+                <div className="absolute inset-0 bg-slate-50/50" />
+                <div
+                    className="absolute inset-0 opacity-[0.15]"
+                    style={{
+                        backgroundImage: `linear-gradient(to right, #6366f1 1px, transparent 1px), linear-gradient(to bottom, #6366f1 1px, transparent 1px)`,
+                        backgroundSize: '40px 40px',
+                        maskImage: 'radial-gradient(ellipse 60% 50% at 50% 0%, #000 70%, transparent 100%)',
+                        WebkitMaskImage: 'radial-gradient(ellipse 60% 50% at 50% 0%, #000 70%, transparent 100%)'
+                    }}
+                />
+                <div className="absolute -top-[10%] left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-[#ddd6fe] blur-[120px] rounded-full opacity-40"></div>
+                <div className="absolute top-[10%] left-[5%] w-[400px] h-[400px] bg-[#cffafe] blur-[100px] rounded-full opacity-40"></div>
+                <div className="absolute top-[5%] right-[5%] w-[400px] h-[400px] bg-[#e0e7ff] blur-[100px] rounded-full opacity-40"></div>
             </div>
 
-            <div className="p-8 rounded-3xl bg-white/5 border border-white/10 hover:border-cyan-500/50 transition-colors">
-              <div className="bg-cyan-500/20 p-3 rounded-2xl w-fit mb-6">
-                <Shield className="h-6 w-6 text-cyan-400" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Enterprise Security</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">Military-grade encryption for your most sensitive legal and professional documents.</p>
-            </div>
+            {/* --- CONTENT WRAPPER --- */}
+            <div className="relative z-10">
 
-            <div className="p-8 rounded-3xl bg-white/5 border border-white/10 hover:border-indigo-500/50 transition-colors">
-              <div className="bg-indigo-500/20 p-3 rounded-2xl w-fit mb-6">
-                <Zap className="h-6 w-6 text-indigo-400" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Format Agnostic</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">Support for PDF, Word, and text files. Everything is searchable, everything is organized.</p>
+                {/* --- 2. NAVIGATION --- */}
+                <nav className="flex justify-between items-center px-6 py-8 max-w-7xl mx-auto">
+                    <div className="flex items-center gap-2">
+                        <div className="bg-violet-600 p-1.5 rounded-xl shadow-lg shadow-violet-200">
+                            <Shield className="h-6 w-6 text-white" />
+                        </div>
+                        <span className="text-2xl font-black tracking-tight text-slate-800">Keepr</span>
+                    </div>
+                    <div className="hidden md:flex gap-8 items-center text-sm font-semibold text-slate-600">
+                        <a href="#about" className="hover:text-violet-600 transition-colors">Our Story</a>
+                        <a href="#features" className="hover:text-violet-600 transition-colors">Technology</a>
+                        <Link href="/login" className="text-slate-800 hover:text-violet-600 transition-colors">Sign In</Link>
+                        <Link href="/register" className="bg-slate-900 text-white px-6 py-2.5 rounded-full hover:bg-slate-800 transition-all shadow-xl shadow-slate-200">
+                            Get Started
+                        </Link>
+                    </div>
+                </nav>
+
+                {/* --- 3. HERO SECTION --- */}
+                <section className="relative px-6 pt-24 pb-48">
+                    <div className="max-w-4xl mx-auto text-center relative z-20">
+                        <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm shadow-md border border-violet-100 text-violet-700 px-4 py-2 rounded-full mb-10">
+                            <span className="relative flex h-2.5 w-2.5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-violet-600"></span>
+                            </span>
+                            <span className="text-xs font-bold uppercase tracking-wider">The Intelligent Vault is here</span>
+                        </div>
+
+                        {/* --- INTERACTIVE HEADLINE --- */}
+                        {mounted ? (
+                            <InteractiveHeadline text="Organize your digital consciousness." />
+                        ) : (
+                            <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-slate-900 mb-8 leading-[0.9]">
+                                Organize your digital consciousness.
+                            </h1>
+                        )}
+
+                        <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto mb-12 leading-relaxed font-medium">
+                            Folders are a legacy format. Keepr builds a neural map of your documents, making information retrieval as natural as thought.
+                        </p>
+
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                            <Link href="/register" className="bg-violet-600 text-white px-10 py-5 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 hover:bg-violet-700 transition-all shadow-2xl shadow-violet-300/50 hover:-translate-y-1">
+                                Build Your Vault
+                                <ArrowRight className="h-5 w-5" />
+                            </Link>
+                        </div>
+                    </div>
+
+                    {/* Floating File Icons */}
+                    {mounted && (
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-6xl h-full pointer-events-none z-10">
+                            <FloatingIcon icon={<FileText className="text-violet-600 h-8 w-8" />} pos="top-[0%] left-[8%]" delay="0s" />
+                            <FloatingIcon icon={<FileCode className="text-blue-600 h-8 w-8" />} pos="top-[45%] left-[0%]" delay="0.5s" />
+                            <FloatingIcon icon={<FileImage className="text-emerald-600 h-8 w-8" />} pos="top-[10%] right-[3%]" delay="1.2s" />
+                            <FloatingIcon icon={<MousePointerClick className="text-orange-600 h-8 w-8" />} pos="bottom-[5%] right-[10%]" delay="0.8s" />
+                        </div>
+                    )}
+                </section>
+
+                {/* --- 4. ABOUT SECTION --- */}
+                <section id="about" className="py-32 px-6 bg-slate-900 text-white overflow-hidden rounded-[4rem] mx-4 shadow-3xl">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="grid lg:grid-cols-2 gap-20 items-center">
+                            <div className="relative">
+                                <div className="absolute -top-20 -left-20 w-64 h-64 bg-violet-600/30 blur-[100px]" />
+                                <h2 className="text-4xl md:text-6xl font-black leading-tight mb-8 tracking-tighter">
+                                    Why we built <br />
+                                    <span className="text-violet-400 italic">Keepr.</span>
+                                </h2>
+                                <p className="text-slate-400 text-lg mb-8 leading-relaxed">
+                                    We realized that as our digital lives grew, our ability to find what mattered shrank. We were drowning in filenames like <code className="bg-white/10 px-2 py-1 rounded text-violet-300">final_v2_new.pdf</code>.
+                                </p>
+                                <div className="space-y-6">
+                                    <AboutItem icon={<Zap className="text-violet-400" />} title="Zero Keywords" desc="Ask questions like 'What was my refund policy?' instead of searching for specific words." />
+                                    <AboutItem icon={<Layers className="text-cyan-400" />} title="Semantic Linking" desc="Documents related by concept are automatically connected in your neural vault." />
+                                </div>
+                            </div>
+                            <div className="relative group">
+                                <div className="aspect-square bg-gradient-to-tr from-violet-600 to-cyan-500 rounded-[3rem] transform rotate-3 transition-transform group-hover:rotate-0 duration-700 shadow-2xl overflow-hidden flex items-center justify-center p-12">
+                                    <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8 w-full h-full flex flex-col justify-center items-center">
+                                        <Fingerprint className="h-24 w-24 text-white mb-8 animate-pulse" />
+                                        <div className="h-2 w-3/4 bg-white/20 rounded-full mb-4" />
+                                        <div className="h-2 w-1/2 bg-white/20 rounded-full mb-4" />
+                                        <div className="h-2 w-5/6 bg-white/20 rounded-full" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* --- 5. TESTIMONIALS --- */}
+                <section id="testimonials" className="py-32 px-6">
+                    <div className="max-w-7xl mx-auto text-center mb-24">
+                        <h2 className="text-5xl font-black text-slate-900 tracking-tighter">Loved by teams.</h2>
+                    </div>
+                    <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                        <TestimonialCard name="Alex Rivera" role="Legal Researcher" quote="It's like having a search engine for my own brain." />
+                        <TestimonialCard name="Sarah Chen" role="Architect" quote="The most intuitive file management I've ever used." />
+                        <TestimonialCard name="James Wilson" role="Writer" quote="Semantic search is a productivity superpower." />
+                    </div>
+                </section>
+
+                {/* --- 6. PRICING --- */}
+                <section id="pricing" className="bg-white py-32 px-6">
+                    <div className="max-w-7xl mx-auto text-center mb-20">
+                        <h2 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">Simple, transparent pricing</h2>
+                        <p className="text-slate-500 font-medium">No hidden fees. Just pure semantic power.</p>
+                    </div>
+                    <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                        <PriceCard plan="Starter" price="$0" features={["100 MB", "Basic AI"]} />
+                        <PriceCard plan="Pro" price="$19" featured={true} features={["5 GB", "OCR Vision", "Priority"]} />
+                        <PriceCard plan="Team" price="$49" features={["50 GB", "Shared Vaults"]} />
+                    </div>
+                </section>
+
+                {/* --- 7. FINAL CTA BRIDGE SECTION --- */}
+                <section className="px-6 py-20 bg-white">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="bg-violet-600 rounded-[4rem] p-12 md:p-24 text-center relative overflow-hidden shadow-2xl shadow-violet-200">
+                            <div className="absolute top-0 left-0 w-96 h-96 bg-white/10 blur-3xl rounded-full -translate-x-1/2 -translate-y-1/2" />
+                            <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-400/20 blur-3xl rounded-full translate-x-1/2 translate-y-1/2" />
+
+                            <div className="relative z-10">
+                                <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tighter">
+                                    Ready to organize your <br className="hidden md:block" /> digital consciousness?
+                                </h2>
+                                <p className="text-violet-100 text-lg md:text-xl mb-12 max-w-2xl mx-auto font-medium opacity-90">
+                                    Join 2,000+ professionals who have stopped searching and started finding.
+                                </p>
+                                <Link href="/register" className="bg-white text-violet-600 px-12 py-5 rounded-2xl font-black text-xl hover:bg-violet-50 transition-all inline-flex items-center gap-2 hover:scale-105">
+                                    Get Started for Free
+                                    <Zap className="h-6 w-6 fill-current" />
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* --- 8. BULKED FOOTER --- */}
+                <footer className="bg-[#0E1A35] pt-32 pb-12 px-8 border-t border-white/5 rounded-t-[4rem] mt-20 text-white">
+                    <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-16 mb-24">
+                        <div className="col-span-2">
+                            <div className="flex items-center gap-2 mb-8">
+                                <div className="bg-violet-600 p-2 rounded-xl shadow-lg shadow-violet-500/50">
+                                    <Shield className="h-6 w-6 text-white" />
+                                </div>
+                                <span className="text-3xl font-black tracking-tight text-white italic">Keepr</span>
+                            </div>
+                            <p className="text-slate-400 text-sm leading-relaxed max-w-xs mb-10">
+                                The intelligent vault for your professional knowledge. Built on the next generation of semantic intelligence.
+                            </p>
+                            <div className="flex gap-6">
+                                <Twitter className="h-6 w-6 text-slate-500 hover:text-violet-400 cursor-pointer transition-all" />
+                                <Github className="h-6 w-6 text-slate-500 hover:text-violet-400 cursor-pointer transition-all" />
+                                <Linkedin className="h-6 w-6 text-slate-500 hover:text-violet-400 cursor-pointer transition-all" />
+                            </div>
+                        </div>
+
+                        {/* Footer Link Columns */}
+                        <div>
+                            <h4 className="font-bold text-white mb-8 uppercase text-[11px] tracking-[0.2em] opacity-50">Product</h4>
+                            <ul className="space-y-5 text-sm text-slate-400 font-semibold">
+                                <li><a href="#" className="hover:text-violet-400 transition-colors">AI Search</a></li>
+                                <li><a href="#" className="hover:text-violet-400 transition-colors">OCR Vision</a></li>
+                                <li><a href="#" className="hover:text-violet-400 transition-colors">Security</a></li>
+                                <li><a href="#" className="hover:text-violet-400 transition-colors">Pricing</a></li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 className="font-bold text-white mb-8 uppercase text-[11px] tracking-[0.2em] opacity-50">Company</h4>
+                            <ul className="space-y-5 text-sm text-slate-400 font-semibold">
+                                <li><a href="#" className="hover:text-violet-400 transition-colors">Our Story</a></li>
+                                <li><a href="#" className="hover:text-violet-400 transition-colors">Careers</a></li>
+                                <li><a href="#" className="hover:text-violet-400 transition-colors">Blog</a></li>
+                                <li><a href="#" className="hover:text-violet-400 transition-colors">Contact</a></li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 className="font-bold text-white mb-8 uppercase text-[11px] tracking-[0.2em] opacity-50">Legal</h4>
+                            <ul className="space-y-5 text-sm text-slate-400 font-semibold">
+                                <li><a href="#" className="hover:text-violet-400 transition-colors">Privacy</a></li>
+                                <li><a href="#" className="hover:text-violet-400 transition-colors">Terms</a></li>
+                                <li><a href="#" className="hover:text-violet-400 transition-colors">Cookie Policy</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div className="max-w-7xl mx-auto border-t border-white/10 pt-12 flex flex-col md:flex-row justify-between items-center gap-8">
+                        <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">
+                            © 2026 Keepr Technologies Inc.
+                        </p>
+                        <div className="flex gap-10 text-[10px] text-slate-500 font-black uppercase tracking-[0.3em]">
+                            <span className="hover:text-white cursor-pointer transition-colors">System Status</span>
+                            <span className="hover:text-white cursor-pointer transition-colors">Security Audit</span>
+                        </div>
+                    </div>
+                </footer>
             </div>
-          </div>
-        </section>
-      </div>
-  );
+        </div>
+    );
+}
+
+/* --- REUSABLE SUB-COMPONENTS --- */
+
+function InteractiveHeadline({ text }: { text: string }) {
+    return (
+        <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-slate-900 mb-8 leading-[0.9] flex flex-wrap justify-center">
+            {text.split(" ").map((word, wordIndex) => (
+                <span key={wordIndex} className="inline-flex mr-4 last:mr-0">
+                    {word.split("").map((char, charIndex) => (
+                        <motion.span
+                            key={charIndex}
+                            whileHover={{
+                                scale: 1.2,
+                                color: "#7c3aed", // violet-600
+                                translateY: -10,
+                                rotate: charIndex % 2 === 0 ? 5 : -5
+                            }}
+                            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                            className="inline-block cursor-default select-none transition-colors duration-200"
+                        >
+                            {char}
+                        </motion.span>
+                    ))}
+                </span>
+            ))}
+        </h1>
+    );
+}
+
+function FloatingIcon({ icon, pos, delay }: { icon: React.ReactNode, pos: string, delay: string }) {
+    return (
+        <div className={`absolute ${pos} p-8 bg-white rounded-[2rem] shadow-[0_30px_60px_rgba(0,0,0,0.12)] border border-slate-100 animate-bounce-slow flex items-center justify-center pointer-events-none z-20`} style={{ animationDelay: delay }}>
+            {icon}
+        </div>
+    );
+}
+
+function AboutItem({ icon, title, desc }: { icon: React.ReactNode, title: string, desc: string }) {
+    return (
+        <div className="flex gap-5">
+            <div className="bg-white/5 p-4 rounded-2xl h-fit border border-white/10 shadow-inner">{icon}</div>
+            <div>
+                <h4 className="font-bold text-xl mb-1 tracking-tight">{title}</h4>
+                <p className="text-slate-400 text-sm leading-relaxed">{desc}</p>
+            </div>
+        </div>
+    );
+}
+
+function TestimonialCard({ name, role, quote }: { name: string, role: string, quote: string }) {
+    return (
+        <div className="p-12 rounded-[2.5rem] bg-white border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-700 group hover:-translate-y-2">
+            <Quote className="h-12 w-12 text-violet-100 mb-8 group-hover:text-violet-400 transition-colors" />
+            <p className="text-slate-600 italic mb-10 text-lg leading-relaxed font-medium">"{quote}"</p>
+            <h5 className="font-bold text-slate-900 text-lg tracking-tight">{name}</h5>
+            <p className="text-xs text-slate-400 uppercase font-black tracking-[0.25em] mt-1">{role}</p>
+        </div>
+    );
+}
+
+function PriceCard({ plan, price, features, featured = false }: { plan: string, price: string, features: string[], featured?: boolean }) {
+    return (
+        <div className={`p-12 rounded-[3rem] border transition-all duration-500 cursor-default
+        ${featured
+            ? 'bg-slate-900 text-white shadow-2xl md:scale-110 z-10 border-slate-800 hover:shadow-violet-500/20 hover:-translate-y-2'
+            : 'bg-white text-slate-900 border-slate-200 hover:shadow-xl hover:border-violet-200 hover:-translate-y-2'
+        }`}>
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-violet-500">{plan}</span>
+            <div className="my-8">
+                <span className="text-6xl font-black leading-none tracking-tighter">{price}</span>
+                <span className="text-slate-500 ml-2 font-bold uppercase text-xs tracking-widest">/mo</span>
+            </div>
+            <ul className="space-y-5 mb-12">
+                {features.map((f, i) => (
+                    <li key={i} className="flex items-center gap-4 text-sm font-semibold">
+                        <Check className={`h-5 w-5 ${featured ? 'text-violet-400' : 'text-violet-600'}`} /> {f}
+                    </li>
+                ))}
+            </ul>
+            <button className={`w-full py-5 rounded-2xl font-black text-lg transition-all ${featured ? 'bg-violet-600 text-white shadow-xl shadow-violet-500/30 hover:bg-violet-500' : 'bg-slate-100 text-slate-800 hover:bg-slate-200'}`}>
+                Choose {plan}
+            </button>
+        </div>
+    );
 }
