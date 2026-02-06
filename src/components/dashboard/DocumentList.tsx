@@ -2,6 +2,7 @@
 
 import { Document } from "@/types";
 import { useDocuments, useDeleteDocument } from "@/hooks/useDocuments";
+import { useSearchStore } from "@/store/useSearchStore";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -23,117 +24,148 @@ interface DocumentListProps {
 export default function DocumentList({ documents: searchResults }: DocumentListProps) {
     const { data: fetchedDocs, isLoading, isError } = useDocuments();
     const deleteMutation = useDeleteDocument();
+    const filter = useSearchStore((state) => state.filter);
 
-    // 3. Logic to decide which data to show
-    // Use searchResults if they exist, otherwise fallback to TanStack Query data
     const displayDocs = (searchResults && Array.isArray(searchResults))
         ? searchResults
-        : fetchedDocs;
+        : fetchedDocs?.filter((doc: Document) => {
+            if (filter === 'all') return true;
+            return doc.type === filter;
+        });
 
     const storageBaseUrl = `${process.env.NEXT_PUBLIC_API_URL}/storage`;
 
     return (
         <div className="mt-8">
-            {/* 4. Dynamic title based on context */}
-            <h2 className="text-xl font-semibold mb-4 border-b pb-2">
-                {searchResults ? "Search Results" : "Your Documents"}
+            <h2 className="text-xl font-semibold mb-6 border-b pb-2 text-slate-800">
+                {searchResults ? "Search Results" : "Your Vault"}
             </h2>
 
-            {/* Only show loading for the initial vault fetch, not when search results are present */}
             {isLoading && !searchResults && <p className="text-slate-500 animate-pulse">Fetching your vault...</p>}
             {isError && <p className="text-red-500">Could not connect to the API.</p>}
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {/* MASONRY CONTAINER */}
+            <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
                 {displayDocs?.map((doc: Document) => (
                     <div
                         key={doc.id}
-                        className="p-4 bg-white border rounded-lg shadow-sm hover:shadow-md transition-all flex flex-col justify-between relative group"
+                        className="break-inside-avoid bg-white border border-slate-200 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col relative group overflow-hidden"
                     >
-                        {/* ... (rest of your existing card JSX stays exactly the same) ... */}
-                        <div>
-                            <div className="flex justify-between items-start mb-2">
-                                <h3 className="font-bold text-slate-800 truncate pr-2" title={doc.title}>
+                        {/* HEADER SECTION (Title & Type) */}
+                        <div className="p-5 pb-2">
+                            <div className="flex justify-between items-start">
+                                <h3 className="font-bold text-slate-800 truncate pr-2 flex-1" title={doc.title}>
                                     {doc.title}
                                 </h3>
-                                <span className={`text-[10px] px-2 py-0.5 rounded uppercase font-medium ${
-                                    doc.type === 'file' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
+                                <span className={`text-[9px] px-2 py-0.5 rounded-full uppercase font-black tracking-widest ${
+                                    doc.type === 'file' ? 'bg-indigo-50 text-indigo-600 border border-indigo-100' : 'bg-emerald-50 text-emerald-600 border border-emerald-100'
                                 }`}>
                                     {doc.type}
                                 </span>
                             </div>
+                        </div>
 
+                        {/* BODY CONTENT */}
+                        <div className="px-5 pb-5">
                             {doc.type === 'note' ? (
-                                <p className="text-sm text-slate-500 mt-2 line-clamp-4 italic">
+                                <p className="text-sm text-slate-500 mt-2 leading-relaxed italic">
                                     {doc.content || "No content provided."}
                                 </p>
                             ) : (
                                 <div className="mt-2">
-                                    {doc.file_path?.match(/\.(jpeg|jpg|gif|png)$/i) ? (
-                                        <div className="relative aspect-video w-full overflow-hidden rounded-md border bg-slate-100 mb-3">
+                                    {doc.file_path?.match(/\.(jpeg|jpg|gif|png|webp)$/i) ? (
+                                        <div className="relative group/img aspect-auto w-full overflow-hidden rounded-2xl border border-slate-100 bg-slate-50">
                                             <img
                                                 src={`${storageBaseUrl}/${doc.file_path}`}
                                                 alt={doc.title}
-                                                className="h-full w-full object-cover"
+                                                className="w-full h-auto object-cover transition-transform duration-500 group-hover/img:scale-105"
                                             />
+
+                                            {/* OCR OVERLAY */}
+                                            {doc.content && (
+                                                <div className="absolute inset-0 bg-slate-900/90 opacity-0 group-hover/img:opacity-100 transition-all duration-300 p-4 overflow-y-auto">
+                                                    <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest block mb-2">AI Transcription</span>
+                                                    <p className="text-[11px] text-slate-200 leading-relaxed font-mono">
+                                                        {doc.content}
+                                                    </p>
+                                                </div>
+                                            )}
                                         </div>
                                     ) : (
-                                        <div className="flex items-center justify-center aspect-video w-full rounded-md border bg-slate-50 mb-3">
-                                            <span className="text-2xl">📄</span>
+                                        <div className="flex items-center justify-center h-32 w-full rounded-2xl border border-dashed border-slate-200 bg-slate-50 mb-3 text-3xl">
+                                            📄
                                         </div>
                                     )}
-                                    <a
-                                        href={`${storageBaseUrl}/${doc.file_path}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
-                                    >
-                                        📎 View Attachment
-                                    </a>
+
+                                    <div className="mt-4 flex justify-between items-center">
+                                        <a
+                                            href={`${storageBaseUrl}/${doc.file_path}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 transition-colors uppercase tracking-tighter"
+                                        >
+                                            📎 View Original
+                                        </a>
+
+                                        {doc.content && (
+                                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest flex items-center gap-1">
+                                                <span className="h-1 w-1 bg-emerald-500 rounded-full animate-pulse" />
+                                                Indexed
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
                             )}
                         </div>
 
-                        <div className="mt-3 pt-2 border-t text-[10px] text-slate-400 flex justify-between items-center">
-                            <span>ID: #{doc.id}</span>
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                    <button
-                                        disabled={deleteMutation.isPending}
-                                        className="opacity-0 group-hover:opacity-100 text-slate-400 text-sm hover:text-red-600 hover:bg-red-50 p-1 rounded-md transition-all duration-200"
-                                        title="Delete forever"
-                                    >
-                                        {deleteMutation.isPending ? "..." : "🗑️"}
-                                    </button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            This action cannot be undone. This will permanently delete <strong>{doc.title}</strong> from your vault.
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction
-                                            onClick={() => deleteMutation.mutate(doc.id)}
-                                            className="bg-red-600 hover:bg-red-700 text-white"
+                        {/* FOOTER ACTIONS */}
+                        <div className="px-5 py-3 bg-slate-50/50 border-t border-slate-100 flex justify-between items-center">
+                            <span className="text-[10px] text-slate-400 font-mono">#{doc.id}</span>
+
+                            <div className="flex items-center gap-4">
+                                <span className="text-[10px] text-slate-400 font-medium">
+                                    {doc.created_at ? new Date(doc.created_at).toLocaleDateString() : ''}
+                                </span>
+
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <button
+                                            disabled={deleteMutation.isPending}
+                                            className="text-slate-400 hover:text-red-600 transition-colors"
+                                            title="Delete permanently"
                                         >
-                                            Delete Forever
-                                        </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                            <span>{doc.created_at ? new Date(doc.created_at).toLocaleDateString() : ''}</span>
+                                            🗑️
+                                        </button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent className="rounded-[2rem]">
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Remove from Vault?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                This will permanently erase <strong>{doc.title}</strong>.
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel className="rounded-xl">Keep it</AlertDialogCancel>
+                                            <AlertDialogAction
+                                                onClick={() => deleteMutation.mutate(doc.id)}
+                                                className="bg-red-600 hover:bg-red-700 text-white rounded-xl"
+                                            >
+                                                Delete
+                                            </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+                            </div>
                         </div>
                     </div>
                 ))}
             </div>
 
-            {/* 5. Handle empty states for both search and regular list */}
+            {/* EMPTY STATE */}
             {!isLoading && displayDocs?.length === 0 && (
-                <div className="text-center py-12 border-2 border-dashed rounded-xl">
-                    <p className="text-slate-400">
-                        {searchResults ? "No results found for your query." : "Your vault is empty."}
+                <div className="text-center py-20 border-2 border-dashed border-slate-200 rounded-[3rem]">
+                    <p className="text-slate-400 text-lg font-medium">
+                        {searchResults ? "No semantic matches found." : "Your vault is currently empty."}
                     </p>
                 </div>
             )}

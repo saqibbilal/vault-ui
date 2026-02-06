@@ -26,18 +26,18 @@ export default function DashboardContent() {
     }
 
     return (
-        <div className="p-8 max-w-5xl mx-auto">
+        <div className="p-12 max-w-6xl mx-auto">
             <DashboardHeader />
-            <SemanticSearch />
 
-            {/* If searchResults is null, we show the dashboard.
-                If it is an array (even empty), we show the results view. */}
-            {searchResults === null ? (
-                <>
-                    <DocumentForm />
-                    <DocumentList />
-                </>
-            ) : (
+            <div className="grid grid-cols-1 gap-8 mt-8">
+                <SemanticSearch />
+
+                {searchResults === null ? (
+                    <div className="space-y-12">
+                        <DocumentForm />
+                        <DocumentList />
+                    </div>
+                ) : (
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
                         <button onClick={clearSearch} className="hover:text-indigo-600 transition-colors">
@@ -60,7 +60,8 @@ export default function DashboardContent() {
                         </div>
                     )}
                 </div>
-            )}
+                )}
+            </div>
         </div>
     );
 }
