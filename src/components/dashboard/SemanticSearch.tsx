@@ -61,7 +61,7 @@ export default function SemanticSearch() {
                             variant="ghost"
                             size="sm"
                             onClick={handleClear}
-                            className="h-9 text-slate-400 hover:text-slate-600"
+                            className="h-9 text-slate-500 hover:text-slate-600"
                         >
                             Clear
                         </Button>
@@ -70,7 +70,7 @@ export default function SemanticSearch() {
                         type="submit"
                         size="sm"
                         disabled={isSearching}
-                        className="h-9 bg-slate-900 hover:bg-indigo-600 text-white transition-colors"
+                        className="h-9 bg-violet-500 text-white hover:bg-violet-600 shadow-violet-200"
                     >
                         {isSearching ? <Loader2 className="animate-spin h-4 w-4" /> : <Search className="h-4 w-4" />}
                     </Button>
