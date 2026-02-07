@@ -2,21 +2,33 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion'; // Added motion import
+import { motion, useScroll, useTransform } from 'framer-motion';
+import HowItWorks from "@/components/landingPage/HowItWorks";
 import {
     FileText, Shield, Search, Cpu, Check, ArrowRight,
     FileCode, FileImage, MousePointerClick, Star, Quote,
-    Github, Twitter, Linkedin, Zap, Fingerprint, Layers
+    Github, Twitter, Linkedin, Zap, Fingerprint, Layers, ExternalLink
 } from "lucide-react";
 
 export default function LandingPage() {
     const [mounted, setMounted] = useState(false);
+    const [hoveredPrice, setHoveredPrice] = useState<string | null>(null);
+
     useEffect(() => setMounted(true), []);
+
+    const { scrollY } = useScroll();
+    const navBackground = useTransform(scrollY, [0, 50], ["rgba(255, 255, 255, 0)", "rgba(255, 255, 255, 0.8)"]);
+    const navBorder = useTransform(scrollY, [0, 50], ["rgba(226, 232, 240, 0)", "rgba(226, 232, 240, 0.8)"]);
+    const navPadding = useTransform(scrollY, [0, 50], ["2rem", "1rem"]);
+
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     return (
         <div className="bg-white text-slate-900 font-sans selection:bg-violet-100 overflow-x-hidden relative">
 
-            {/* --- 1. THE "FORCED" HERO BACKGROUND --- */}
+            {/* --- 1. THE HERO BACKGROUND --- */}
             <div className="absolute top-0 left-0 w-full h-[1000px] z-0 overflow-hidden pointer-events-none">
                 <div className="absolute inset-0 bg-slate-50/50" />
                 <div
@@ -29,33 +41,41 @@ export default function LandingPage() {
                     }}
                 />
                 <div className="absolute -top-[10%] left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-[#ddd6fe] blur-[120px] rounded-full opacity-40"></div>
-                <div className="absolute top-[10%] left-[5%] w-[400px] h-[400px] bg-[#cffafe] blur-[100px] rounded-full opacity-40"></div>
-                <div className="absolute top-[5%] right-[5%] w-[400px] h-[400px] bg-[#e0e7ff] blur-[100px] rounded-full opacity-40"></div>
             </div>
 
             {/* --- CONTENT WRAPPER --- */}
             <div className="relative z-10">
 
-                {/* --- 2. NAVIGATION --- */}
-                <nav className="flex justify-between items-center px-6 py-8 max-w-7xl mx-auto">
-                    <div className="flex items-center gap-2">
-                        <div className="bg-violet-600 p-1.5 rounded-xl shadow-lg shadow-violet-200">
-                            <Shield className="h-6 w-6 text-white" />
+                {/* --- 2. STICKY NAVIGATION --- */}
+                <motion.nav
+                    style={{ backgroundColor: navBackground, borderColor: navBorder, paddingBlock: navPadding }}
+                    className="fixed top-0 left-0 right-0 z-[100] border-b backdrop-blur-md transition-all duration-300"
+                >
+                    <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+                        <button onClick={scrollToTop} className="flex items-center gap-2 group">
+                            <div className="bg-violet-600 p-1.5 rounded-xl shadow-lg shadow-violet-200 group-hover:scale-110 transition-transform">
+                                <Shield className="h-6 w-6 text-white" />
+                            </div>
+                            <span className="text-2xl font-black tracking-tight text-slate-800">Keepr</span>
+                        </button>
+
+                        <div className="hidden md:flex gap-8 items-center text-sm font-semibold text-slate-600">
+                            <a href="#about" className="hover:text-violet-600 transition-colors">Why Keepr?</a>
+                            <a href="#how-it-works" className="hover:text-violet-600 transition-colors">How it Works</a>
+                            <a href="#pricing" className="hover:text-violet-600 transition-colors">Pricing</a>
+
+                            <div className="h-4 w-[1px] bg-slate-200 mx-2" />
+
+                            <Link href="/login" className="text-slate-800 hover:text-violet-600 transition-colors">Sign In</Link>
+                            <Link href="/register" className="bg-slate-900 text-white px-6 py-2.5 rounded-full hover:bg-slate-800 transition-all shadow-xl shadow-slate-200">
+                                Get Started
+                            </Link>
                         </div>
-                        <span className="text-2xl font-black tracking-tight text-slate-800">Keepr</span>
                     </div>
-                    <div className="hidden md:flex gap-8 items-center text-sm font-semibold text-slate-600">
-                        <a href="#about" className="hover:text-violet-600 transition-colors">Our Story</a>
-                        <a href="#features" className="hover:text-violet-600 transition-colors">Technology</a>
-                        <Link href="/login" className="text-slate-800 hover:text-violet-600 transition-colors">Sign In</Link>
-                        <Link href="/register" className="bg-slate-900 text-white px-6 py-2.5 rounded-full hover:bg-slate-800 transition-all shadow-xl shadow-slate-200">
-                            Get Started
-                        </Link>
-                    </div>
-                </nav>
+                </motion.nav>
 
                 {/* --- 3. HERO SECTION --- */}
-                <section className="relative px-6 pt-24 pb-48">
+                <section className="relative px-6 pt-56 pb-48">
                     <div className="max-w-4xl mx-auto text-center relative z-20">
                         <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm shadow-md border border-violet-100 text-violet-700 px-4 py-2 rounded-full mb-10">
                             <span className="relative flex h-2.5 w-2.5">
@@ -65,7 +85,6 @@ export default function LandingPage() {
                             <span className="text-xs font-bold uppercase tracking-wider">The Intelligent Vault is here</span>
                         </div>
 
-                        {/* --- INTERACTIVE HEADLINE --- */}
                         {mounted ? (
                             <InteractiveHeadline text="Organize your digital consciousness." />
                         ) : (
@@ -75,7 +94,7 @@ export default function LandingPage() {
                         )}
 
                         <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto mb-12 leading-relaxed font-medium">
-                            Folders are a legacy format. Keepr builds a neural map of your documents, making information retrieval as natural as thought.
+                            Folders are a legacy format. Keepr builds a neural map of your documents, making retrieval as natural as thought.
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -86,19 +105,18 @@ export default function LandingPage() {
                         </div>
                     </div>
 
-                    {/* Floating File Icons */}
                     {mounted && (
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-6xl h-full pointer-events-none z-10">
-                            <FloatingIcon icon={<FileText className="text-violet-600 h-8 w-8" />} pos="top-[0%] left-[8%]" delay="0s" />
-                            <FloatingIcon icon={<FileCode className="text-blue-600 h-8 w-8" />} pos="top-[45%] left-[0%]" delay="0.5s" />
-                            <FloatingIcon icon={<FileImage className="text-emerald-600 h-8 w-8" />} pos="top-[10%] right-[3%]" delay="1.2s" />
-                            <FloatingIcon icon={<MousePointerClick className="text-orange-600 h-8 w-8" />} pos="bottom-[5%] right-[10%]" delay="0.8s" />
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-6xl h-full pointer-events-none z-[50]">
+                            <FloatingIcon icon={<FileText className="text-violet-600 h-8 w-8" />} pos="top-[15%] left-[5%]" delay="0s" />
+                            <FloatingIcon icon={<FileCode className="text-blue-600 h-8 w-8" />} pos="top-[55%] left-[2%]" delay="0.5s" />
+                            <FloatingIcon icon={<FileImage className="text-emerald-600 h-8 w-8" />} pos="top-[20%] right-[3%]" delay="1.2s" />
+                            <FloatingIcon icon={<MousePointerClick className="text-orange-600 h-8 w-8" />} pos="bottom-[10%] right-[8%]" delay="0.8s" />
                         </div>
                     )}
                 </section>
 
                 {/* --- 4. ABOUT SECTION --- */}
-                <section id="about" className="py-32 px-6 bg-slate-900 text-white overflow-hidden rounded-[4rem] mx-4 shadow-3xl">
+                <section id="about" className="pt-14 pb-18 my-10 px-6 scroll-mt-20 bg-slate-900 text-white overflow-hidden rounded-[4rem] mx-4 shadow-3xl">
                     <div className="max-w-7xl mx-auto">
                         <div className="grid lg:grid-cols-2 gap-20 items-center">
                             <div className="relative">
@@ -108,11 +126,11 @@ export default function LandingPage() {
                                     <span className="text-violet-400 italic">Keepr.</span>
                                 </h2>
                                 <p className="text-slate-400 text-lg mb-8 leading-relaxed">
-                                    We realized that as our digital lives grew, our ability to find what mattered shrank. We were drowning in filenames like <code className="bg-white/10 px-2 py-1 rounded text-violet-300">final_v2_new.pdf</code>.
+                                    We realized that as our digital lives grew, our ability to find what mattered shrank.
                                 </p>
                                 <div className="space-y-6">
-                                    <AboutItem icon={<Zap className="text-violet-400" />} title="Zero Keywords" desc="Ask questions like 'What was my refund policy?' instead of searching for specific words." />
-                                    <AboutItem icon={<Layers className="text-cyan-400" />} title="Semantic Linking" desc="Documents related by concept are automatically connected in your neural vault." />
+                                    <AboutItem icon={<Zap className="text-violet-400" />} title="Zero Keywords" desc="Ask questions like 'What was my refund policy?' instead of searching for words." />
+                                    <AboutItem icon={<Layers className="text-cyan-400" />} title="Semantic Linking" desc="Documents related by concept are automatically connected in your vault." />
                                 </div>
                             </div>
                             <div className="relative group">
@@ -129,95 +147,105 @@ export default function LandingPage() {
                     </div>
                 </section>
 
-                {/* --- 5. TESTIMONIALS --- */}
-                <section id="testimonials" className="py-32 px-6">
+                {/* --- 5. HOW IT WORKS --- */}
+                <div id="how-it-works" className="scroll-mt-32">
+                    <HowItWorks />
+                </div>
+
+                {/* --- 6. TESTIMONIALS --- */}
+                <section id="testimonials" className="pt-10 pb-16 my-10 px-6">
                     <div className="max-w-7xl mx-auto text-center mb-24">
                         <h2 className="text-5xl font-black text-slate-900 tracking-tighter">Loved by teams.</h2>
                     </div>
                     <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                         <TestimonialCard name="Alex Rivera" role="Legal Researcher" quote="It's like having a search engine for my own brain." />
                         <TestimonialCard name="Sarah Chen" role="Architect" quote="The most intuitive file management I've ever used." />
-                        <TestimonialCard name="James Wilson" role="Writer" quote="Semantic search is a productivity superpower." />
+                        <TestimonialCard name="James Wilson" role="Writer" quote="Semantic search is a superpower." />
                     </div>
                 </section>
 
-                {/* --- 6. PRICING --- */}
-                <section id="pricing" className="bg-white py-32 px-6">
+                {/* --- 7. PRICING --- */}
+                <section id="pricing" className="bg-white pt-10 pb-22 my-10 px-6 scroll-mt-20">
                     <div className="max-w-7xl mx-auto text-center mb-20">
                         <h2 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">Simple, transparent pricing</h2>
-                        <p className="text-slate-500 font-medium">No hidden fees. Just pure semantic power.</p>
+                        <p className="text-slate-500 font-medium">Choose the plan that fits your vault size.</p>
                     </div>
                     <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                        <PriceCard plan="Starter" price="$0" features={["100 MB", "Basic AI"]} />
-                        <PriceCard plan="Pro" price="$19" featured={true} features={["5 GB", "OCR Vision", "Priority"]} />
-                        <PriceCard plan="Team" price="$49" features={["50 GB", "Shared Vaults"]} />
+                        <PriceCard
+                            plan="Starter"
+                            price="$0"
+                            features={["100 MB", "Basic AI"]}
+                            isFocused={hoveredPrice === 'Starter'}
+                            onHover={() => setHoveredPrice('Starter')}
+                        />
+                        <PriceCard
+                            plan="Pro"
+                            price="$19"
+                            features={["5 GB", "OCR Vision", "Priority"]}
+                            isFocused={hoveredPrice === 'Pro'}
+                            onHover={() => setHoveredPrice('Pro')}
+                        />
+                        <PriceCard
+                            plan="Team"
+                            price="$49"
+                            features={["50 GB", "Shared Vaults"]}
+                            isFocused={hoveredPrice === 'Team'}
+                            onHover={() => setHoveredPrice('Team')}
+                        />
                     </div>
                 </section>
 
-                {/* --- 7. FINAL CTA BRIDGE SECTION --- */}
+                {/* --- 8. BRIDGE CTA --- */}
                 <section className="px-6 py-20 bg-white">
                     <div className="max-w-7xl mx-auto">
                         <div className="bg-violet-600 rounded-[4rem] p-12 md:p-24 text-center relative overflow-hidden shadow-2xl shadow-violet-200">
-                            <div className="absolute top-0 left-0 w-96 h-96 bg-white/10 blur-3xl rounded-full -translate-x-1/2 -translate-y-1/2" />
-                            <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-400/20 blur-3xl rounded-full translate-x-1/2 translate-y-1/2" />
-
                             <div className="relative z-10">
-                                <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tighter">
-                                    Ready to organize your <br className="hidden md:block" /> digital consciousness?
-                                </h2>
-                                <p className="text-violet-100 text-lg md:text-xl mb-12 max-w-2xl mx-auto font-medium opacity-90">
-                                    Join 2,000+ professionals who have stopped searching and started finding.
-                                </p>
+                                <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tighter">Ready to organize?</h2>
                                 <Link href="/register" className="bg-white text-violet-600 px-12 py-5 rounded-2xl font-black text-xl hover:bg-violet-50 transition-all inline-flex items-center gap-2 hover:scale-105">
-                                    Get Started for Free
-                                    <Zap className="h-6 w-6 fill-current" />
+                                    Get Started <Zap className="h-6 w-6 fill-current" />
                                 </Link>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* --- 8. BULKED FOOTER --- */}
-                <footer className="bg-[#0E1A35] pt-32 pb-12 px-8 border-t border-white/5 rounded-t-[4rem] mt-20 text-white">
-                    <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-16 mb-24">
+                {/* --- 9. FOOTER --- */}
+                <footer className="bg-[#0E1A35] pt-32 pb-6 px-8 border-t border-white/5 rounded-t-[4rem] mt-20 text-white">
+                    <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-16 mb-24 text-white">
                         <div className="col-span-2">
                             <div className="flex items-center gap-2 mb-8">
-                                <div className="bg-violet-600 p-2 rounded-xl shadow-lg shadow-violet-500/50">
+                                <div className="bg-violet-600 p-2 rounded-xl shadow-lg">
                                     <Shield className="h-6 w-6 text-white" />
                                 </div>
                                 <span className="text-3xl font-black tracking-tight text-white italic">Keepr</span>
                             </div>
                             <p className="text-slate-400 text-sm leading-relaxed max-w-xs mb-10">
-                                The intelligent vault for your professional knowledge. Built on the next generation of semantic intelligence.
+                                The intelligent vault for professional knowledge.
                             </p>
                             <div className="flex gap-6">
-                                <Twitter className="h-6 w-6 text-slate-500 hover:text-violet-400 cursor-pointer transition-all" />
-                                <Github className="h-6 w-6 text-slate-500 hover:text-violet-400 cursor-pointer transition-all" />
-                                <Linkedin className="h-6 w-6 text-slate-500 hover:text-violet-400 cursor-pointer transition-all" />
+                                <Twitter className="h-6 w-6 text-slate-500 hover:text-violet-400 cursor-pointer" />
+                                <Github className="h-6 w-6 text-slate-500 hover:text-violet-400 cursor-pointer" />
+                                <Linkedin className="h-6 w-6 text-slate-500 hover:text-violet-400 cursor-pointer" />
                             </div>
                         </div>
-
-                        {/* Footer Link Columns */}
                         <div>
                             <h4 className="font-bold text-white mb-8 uppercase text-[11px] tracking-[0.2em] opacity-50">Product</h4>
                             <ul className="space-y-5 text-sm text-slate-400 font-semibold">
-                                <li><a href="#" className="hover:text-violet-400 transition-colors">AI Search</a></li>
-                                <li><a href="#" className="hover:text-violet-400 transition-colors">OCR Vision</a></li>
-                                <li><a href="#" className="hover:text-violet-400 transition-colors">Security</a></li>
-                                <li><a href="#" className="hover:text-violet-400 transition-colors">Pricing</a></li>
+                                <li><a href="#how-it-works" className="hover:text-violet-400 transition-colors">AI Search</a></li>
+                                <li><a href="#how-it-works" className="hover:text-violet-400 transition-colors">OCR Vision</a></li>
+                                <li><a href="#about" className="hover:text-violet-400 transition-colors">Security</a></li>
+                                <li><a href="#pricing" className="hover:text-violet-400 transition-colors">Pricing</a></li>
                             </ul>
                         </div>
-
                         <div>
                             <h4 className="font-bold text-white mb-8 uppercase text-[11px] tracking-[0.2em] opacity-50">Company</h4>
                             <ul className="space-y-5 text-sm text-slate-400 font-semibold">
-                                <li><a href="#" className="hover:text-violet-400 transition-colors">Our Story</a></li>
+                                <li><a href="#about" className="hover:text-violet-400 transition-colors">Our Story</a></li>
                                 <li><a href="#" className="hover:text-violet-400 transition-colors">Careers</a></li>
                                 <li><a href="#" className="hover:text-violet-400 transition-colors">Blog</a></li>
                                 <li><a href="#" className="hover:text-violet-400 transition-colors">Contact</a></li>
                             </ul>
                         </div>
-
                         <div>
                             <h4 className="font-bold text-white mb-8 uppercase text-[11px] tracking-[0.2em] opacity-50">Legal</h4>
                             <ul className="space-y-5 text-sm text-slate-400 font-semibold">
@@ -228,14 +256,22 @@ export default function LandingPage() {
                         </div>
                     </div>
 
-                    <div className="max-w-7xl mx-auto border-t border-white/10 pt-12 flex flex-col md:flex-row justify-between items-center gap-8">
-                        <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">
+                    {/* --- NEW SIGNATURE BAR --- */}
+                    <div className="max-w-7xl mx-auto pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <p className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em]">
                             © 2026 Keepr Technologies Inc.
                         </p>
-                        <div className="flex gap-10 text-[10px] text-slate-500 font-black uppercase tracking-[0.3em]">
-                            <span className="hover:text-white cursor-pointer transition-colors">System Status</span>
-                            <span className="hover:text-white cursor-pointer transition-colors">Security Audit</span>
-                        </div>
+                        <a
+                            href="https://mbilal.ca"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/5 hover:bg-white/10 transition-all"
+                        >
+                            <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest group-hover:text-white transition-colors">
+                                Developed by <span className="text-violet-400">mbilal.ca</span>
+                            </span>
+                            <ExternalLink className="h-3 w-3 text-slate-500 group-hover:text-violet-400 transition-colors" />
+                        </a>
                     </div>
                 </footer>
             </div>
@@ -243,7 +279,35 @@ export default function LandingPage() {
     );
 }
 
-/* --- REUSABLE SUB-COMPONENTS --- */
+// ... Reusable components stay exactly the same as previously provided ...
+function PriceCard({ plan, price, features, isFocused, onHover }: { plan: string, price: string, features: string[], isFocused: boolean, onHover: () => void }) {
+    return (
+        <div
+            onMouseEnter={onHover}
+            className={`p-12 rounded-[3rem] border transition-all duration-500 cursor-default
+            ${isFocused
+                ? 'bg-slate-900 text-white shadow-2xl scale-105 z-10 border-slate-800'
+                : 'bg-white text-slate-900 border-slate-200 shadow-sm hover:border-violet-200'
+            }`}
+        >
+            <span className={`text-xs font-black uppercase tracking-[0.2em] ${isFocused ? 'text-violet-400' : 'text-violet-500'}`}>{plan}</span>
+            <div className="my-8">
+                <span className="text-6xl font-black leading-none tracking-tighter">{price}</span>
+                <span className="text-slate-500 ml-2 font-bold uppercase text-xs tracking-widest">/mo</span>
+            </div>
+            <ul className="space-y-5 mb-12">
+                {features.map((f, i) => (
+                    <li key={i} className="flex items-center gap-4 text-sm font-semibold">
+                        <Check className={`h-5 w-5 ${isFocused ? 'text-violet-400' : 'text-violet-600'}`} /> {f}
+                    </li>
+                ))}
+            </ul>
+            <button className={`w-full py-5 rounded-2xl font-black text-lg transition-all ${isFocused ? 'bg-violet-600 text-white shadow-xl shadow-violet-500/30' : 'bg-slate-100 text-slate-800'}`}>
+                Choose {plan}
+            </button>
+        </div>
+    );
+}
 
 function InteractiveHeadline({ text }: { text: string }) {
     return (
@@ -253,14 +317,9 @@ function InteractiveHeadline({ text }: { text: string }) {
                     {word.split("").map((char, charIndex) => (
                         <motion.span
                             key={charIndex}
-                            whileHover={{
-                                scale: 1.2,
-                                color: "#7c3aed", // violet-600
-                                translateY: -10,
-                                rotate: charIndex % 2 === 0 ? 5 : -5
-                            }}
+                            whileHover={{ scale: 1.2, color: "#7c3aed", translateY: -10 }}
                             transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                            className="inline-block cursor-default select-none transition-colors duration-200"
+                            className="inline-block cursor-default select-none"
                         >
                             {char}
                         </motion.span>
@@ -273,7 +332,7 @@ function InteractiveHeadline({ text }: { text: string }) {
 
 function FloatingIcon({ icon, pos, delay }: { icon: React.ReactNode, pos: string, delay: string }) {
     return (
-        <div className={`absolute ${pos} p-8 bg-white rounded-[2rem] shadow-[0_30px_60px_rgba(0,0,0,0.12)] border border-slate-100 animate-bounce-slow flex items-center justify-center pointer-events-none z-20`} style={{ animationDelay: delay }}>
+        <div className={`absolute ${pos} p-8 bg-white rounded-[2rem] shadow-xl border border-slate-100 animate-bounce-slow flex items-center justify-center pointer-events-none z-10`} style={{ animationDelay: delay }}>
             {icon}
         </div>
     );
@@ -282,7 +341,7 @@ function FloatingIcon({ icon, pos, delay }: { icon: React.ReactNode, pos: string
 function AboutItem({ icon, title, desc }: { icon: React.ReactNode, title: string, desc: string }) {
     return (
         <div className="flex gap-5">
-            <div className="bg-white/5 p-4 rounded-2xl h-fit border border-white/10 shadow-inner">{icon}</div>
+            <div className="bg-white/5 p-4 rounded-2xl h-fit border border-white/10">{icon}</div>
             <div>
                 <h4 className="font-bold text-xl mb-1 tracking-tight">{title}</h4>
                 <p className="text-slate-400 text-sm leading-relaxed">{desc}</p>
@@ -293,37 +352,11 @@ function AboutItem({ icon, title, desc }: { icon: React.ReactNode, title: string
 
 function TestimonialCard({ name, role, quote }: { name: string, role: string, quote: string }) {
     return (
-        <div className="p-12 rounded-[2.5rem] bg-white border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-700 group hover:-translate-y-2">
+        <div className="p-12 rounded-[2.5rem] bg-white border border-slate-100 shadow-sm hover:shadow-2xl transition-all group">
             <Quote className="h-12 w-12 text-violet-100 mb-8 group-hover:text-violet-400 transition-colors" />
             <p className="text-slate-600 italic mb-10 text-lg leading-relaxed font-medium">"{quote}"</p>
             <h5 className="font-bold text-slate-900 text-lg tracking-tight">{name}</h5>
             <p className="text-xs text-slate-400 uppercase font-black tracking-[0.25em] mt-1">{role}</p>
-        </div>
-    );
-}
-
-function PriceCard({ plan, price, features, featured = false }: { plan: string, price: string, features: string[], featured?: boolean }) {
-    return (
-        <div className={`p-12 rounded-[3rem] border transition-all duration-500 cursor-default
-        ${featured
-            ? 'bg-slate-900 text-white shadow-2xl md:scale-110 z-10 border-slate-800 hover:shadow-violet-500/20 hover:-translate-y-2'
-            : 'bg-white text-slate-900 border-slate-200 hover:shadow-xl hover:border-violet-200 hover:-translate-y-2'
-        }`}>
-            <span className="text-xs font-black uppercase tracking-[0.2em] text-violet-500">{plan}</span>
-            <div className="my-8">
-                <span className="text-6xl font-black leading-none tracking-tighter">{price}</span>
-                <span className="text-slate-500 ml-2 font-bold uppercase text-xs tracking-widest">/mo</span>
-            </div>
-            <ul className="space-y-5 mb-12">
-                {features.map((f, i) => (
-                    <li key={i} className="flex items-center gap-4 text-sm font-semibold">
-                        <Check className={`h-5 w-5 ${featured ? 'text-violet-400' : 'text-violet-600'}`} /> {f}
-                    </li>
-                ))}
-            </ul>
-            <button className={`w-full py-5 rounded-2xl font-black text-lg transition-all ${featured ? 'bg-violet-600 text-white shadow-xl shadow-violet-500/30 hover:bg-violet-500' : 'bg-slate-100 text-slate-800 hover:bg-slate-200'}`}>
-                Choose {plan}
-            </button>
         </div>
     );
 }
