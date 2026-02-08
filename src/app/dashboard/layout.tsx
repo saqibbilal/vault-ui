@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Sidebar from "@/components/dashboard/Sidebar";
-import { Menu, X, Shield } from "lucide-react";
+import { Menu, Shield } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {

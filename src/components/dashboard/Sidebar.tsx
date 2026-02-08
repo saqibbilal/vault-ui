@@ -34,7 +34,7 @@ export default function Sidebar() {
                 {navItems.map((item) => (
                     <button
                         key={item.id}
-                        onClick={() => setFilter(item.id as any)}
+                        onClick={() => setFilter(item.id as 'all' | 'note' | 'file')}
                         className={`w-full flex items-center gap-4 px-5 py-4 rounded-[1.25rem] transition-all group ${
                             currentFilter === item.id
                                 ? 'bg-violet-600 text-white shadow-xl shadow-violet-500/20'

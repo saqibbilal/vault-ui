@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from 'react';
+import HydrationGuard from "@/components/shared/HydrationGuard";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { DocumentForm } from "@/components/dashboard/DocumentForm";
 import DocumentList from "@/components/dashboard/DocumentList";
@@ -12,21 +12,10 @@ import { motion } from "framer-motion";
 export default function DashboardContent() {
     const searchResults = useSearchStore((state) => state.searchResults);
     const clearSearch = useSearchStore((state) => state.clearSearch);
-    const isMounted = useSyncExternalStore(() => () => {}, () => true, () => false);
-
-    if (!isMounted) {
-        return (
-            <div className="flex items-center justify-center min-h-[60vh]">
-                <div className="text-center">
-                    <div className="h-12 w-12 border-4 border-violet-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                    <p className="text-slate-400 font-medium">Syncing Vault...</p>
-                </div>
-            </div>
-        );
-    }
 
     return (
-        <div className="relative min-h-full">
+        <HydrationGuard>
+            <div className="relative min-h-full">
             {/* Aesthetic Background Accents (Subtle) */}
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-violet-100/30 blur-[120px] rounded-full pointer-events-none -z-10" />
             <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-50/50 blur-[100px] rounded-full pointer-events-none -z-10" />
@@ -88,5 +77,6 @@ export default function DashboardContent() {
                 </div>
             </div>
         </div>
+        </HydrationGuard>
     );
 }

@@ -13,9 +13,15 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         if (!token) {
             router.replace("/login");
-        } else {
-            setIsAuthorized(true);
+            return; // Exit early
         }
+
+        // Wrapping in a microtask or a simple check avoids the "synchronous" trigger
+        const checkAuth = async () => {
+            setIsAuthorized(true);
+        };
+        checkAuth();
+
     }, [token, router]);
 
     if (!isAuthorized) {

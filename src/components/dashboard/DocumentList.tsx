@@ -1,6 +1,7 @@
 "use client";
 
 import { Document } from "@/types";
+import Image from 'next/image';
 import { useDocuments, useDeleteDocument } from "@/hooks/useDocuments";
 import { useSearchStore } from "@/store/useSearchStore";
 import {
@@ -9,7 +10,6 @@ import {
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
-    AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
@@ -22,7 +22,7 @@ interface DocumentListProps {
 }
 
 export default function DocumentList({ documents: searchResults }: DocumentListProps) {
-    const { data: fetchedDocs, isLoading, isError } = useDocuments();
+    const { data: fetchedDocs, isLoading } = useDocuments();
     const deleteMutation = useDeleteDocument();
     const filter = useSearchStore((state) => state.filter);
 
@@ -80,11 +80,16 @@ export default function DocumentList({ documents: searchResults }: DocumentListP
                                 <div className="space-y-5">
                                     {doc.file_path?.match(/\.(jpeg|jpg|gif|png|webp)$/i) ? (
                                         <div className="relative group/img overflow-hidden rounded-[2rem] border border-slate-100 aspect-square sm:aspect-auto">
-                                            <img
-                                                src={`${storageBaseUrl}/${doc.file_path}`}
-                                                alt={doc.title}
-                                                className="w-full h-auto object-cover transition-transform duration-700 group-hover/img:scale-110"
-                                            />
+                                            <div className="relative w-full h-auto overflow-hidden">
+                                                <Image
+                                                    src={`${storageBaseUrl}/${doc.file_path}`}
+                                                    alt={doc.title}
+                                                    width={500} // Add a representative width
+                                                    height={300} // Add a representative height
+                                                    unoptimized // Use this to skip Next.js optimization for external backend URLs
+                                                    className="w-full h-auto object-cover transition-transform duration-700 group-hover/img:scale-110"
+                                                />
+                                            </div>
                                             {doc.content && (
                                                 <div className="absolute inset-0 bg-slate-900/90 opacity-0 group-hover/img:opacity-100 transition-all duration-300 p-6 overflow-y-auto custom-scrollbar">
                                                     <div className="flex items-center gap-2 mb-4">

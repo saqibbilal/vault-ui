@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, X, FileText, UploadCloud, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import axios from "axios";
 
 export function DocumentForm() {
     const [isOpen, setIsOpen] = useState(false);
@@ -31,6 +30,7 @@ export function DocumentForm() {
                 },
                 onError: (error: unknown) => {
                     alert("Failed to save. Check console for details.");
+                    console.log(error);
                 }
             }
         );

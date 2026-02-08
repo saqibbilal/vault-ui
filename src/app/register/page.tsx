@@ -6,9 +6,13 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import axios from "axios";
 import Link from 'next/link';
-import {ArrowRight, Shield, Zap} from "lucide-react";
+import { ArrowRight, Shield } from "lucide-react";
 import { motion } from 'framer-motion';
 import SessionGuard from "@/components/auth/SessionGuard";
+import HydrationGuard from "@/components/shared/HydrationGuard";
+
+// Define the shape of Laravel validation errors
+type ValidationErrors = Record<string, string[]>;
 
 export default function RegisterPage() {
     const [name, setName] = useState("");
@@ -16,7 +20,7 @@ export default function RegisterPage() {
     const [password, setPassword] = useState("");
     const [passwordConfirmation, setPasswordConfirmation] = useState("");
     const [loading, setLoading] = useState(false);
-    const [errors, setErrors] = useState<any>({});
+    const [errors, setErrors] = useState<ValidationErrors>({});
 
     const router = useRouter();
     const { setAuth } = useAuthStore();
@@ -38,7 +42,8 @@ export default function RegisterPage() {
             router.push("/dashboard");
         } catch (error: unknown) {
             if (axios.isAxiosError(error) && error.response?.status === 422) {
-                setErrors(error.response.data.errors);
+                // Laravel returns { errors: { field: [messages] } }
+                setErrors(error.response.data.errors as ValidationErrors);
             } else {
                 alert("An unexpected error occurred.");
             }
@@ -48,7 +53,7 @@ export default function RegisterPage() {
     };
 
     return (
-        <>
+        <HydrationGuard>
             <SessionGuard />
             <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 relative overflow-hidden font-sans">
                 {/* Background Orbs */}
@@ -86,7 +91,7 @@ export default function RegisterPage() {
                                     placeholder="Saqib Bilal"
                                     required
                                 />
-                                {errors.name && <p className="text-[10px] font-bold text-red-500 mt-1 ml-1 uppercase">{errors.name[0]}</p>}
+                                {errors.name?.[0] && <p className="text-[10px] font-bold text-red-500 mt-1 ml-1 uppercase">{errors.name[0]}</p>}
                             </div>
                             <div>
                                 <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Email Address</label>
@@ -98,7 +103,7 @@ export default function RegisterPage() {
                                     placeholder="name@example.com"
                                     required
                                 />
-                                {errors.email && <p className="text-[10px] font-bold text-red-500 mt-1 ml-1 uppercase">{errors.email[0]}</p>}
+                                {errors.email?.[0] && <p className="text-[10px] font-bold text-red-500 mt-1 ml-1 uppercase">{errors.email[0]}</p>}
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
@@ -124,7 +129,7 @@ export default function RegisterPage() {
                                     />
                                 </div>
                             </div>
-                            {errors.password && <p className="text-[10px] font-bold text-red-500 mt-1 ml-1 uppercase">{errors.password[0]}</p>}
+                            {errors.password?.[0] && <p className="text-[10px] font-bold text-red-500 mt-1 ml-1 uppercase">{errors.password[0]}</p>}
 
                             <button
                                 type="submit"
@@ -146,7 +151,7 @@ export default function RegisterPage() {
                         </div>
                     </div>
                 </motion.div>
-            </div >
-        </>
+            </div>
+        </HydrationGuard>
     );
 }
